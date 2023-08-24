@@ -8,11 +8,15 @@ class CategoryGridItem extends StatelessWidget {
 
   final Category category;
 
+  void _showMeals() {
+    print('show meals');
+  }
+
   //override build method
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: _showMeals,
       splashColor: Theme.of(context).primaryColor,
       borderRadius: BorderRadius.circular(16),
       child: Container(
