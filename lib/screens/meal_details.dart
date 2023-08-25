@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:meals/models/meal.dart';
 import 'package:meals/providers/favorites_provider.dart';
 
@@ -11,42 +12,53 @@ class MealDetailsScreen extends ConsumerWidget {
 
   final Meal meal;
 
-  // When a Stateless Widget becomes a ConsumerWidget, the build method is replaced with a build method that takes a BuildContext and a WidgetRef as parameters.
-  // The WidgetRef ref parameter is used to access the providers that are used in the widget tree.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final favoriteMeals = ref.watch(favoriteMealsProvider);
 
-    final bool isFavorite = favoriteMeals.contains(meal);
+    final isFavorite = favoriteMeals.contains(meal);
 
     return Scaffold(
         appBar: AppBar(title: Text(meal.title), actions: [
           IconButton(
             onPressed: () {
-              // Here we are using the ref parameter to access the favoriteMealsProvider and call the toggleMealFavoriteStatus method.
-              final bool wasAdded = ref
+              final wasAdded = ref
                   .read(favoriteMealsProvider.notifier)
                   .toggleMealFavoriteStatus(meal);
               ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    wasAdded? '${meal.title} is now a favorite!' : '${meal.title} is no longer a favorite!'
-                  ),
+                      wasAdded ? '${meal.title} added as a favorite.' : '${meal.title} removed.'),
                 ),
               );
             },
-            icon: Icon(isFavorite? Icons.star : Icons.star_border_outlined),
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) {
+                return RotationTransition(
+                  turns: Tween<double>(begin: 0.8, end: 1).animate(animation),
+                  child: child,
+                );
+              },
+              child: Icon(
+                isFavorite ? Icons.star : Icons.star_border,
+                key: ValueKey(isFavorite),
+              ),
+            ),
           )
         ]),
         body: SingleChildScrollView(
           child: Column(
             children: [
-              Image.network(
-                meal.imageUrl,
-                height: 300,
-                width: double.infinity,
-                fit: BoxFit.cover,
+              Hero(
+                tag: meal.id,
+                child: Image.network(
+                  meal.imageUrl,
+                  height: 300,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
               const SizedBox(height: 14),
               Text(
