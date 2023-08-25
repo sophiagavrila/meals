@@ -1,24 +1,36 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meals/models/meal.dart';
+import 'package:meals/providers/favorites_provider.dart';
 
-class MealDetailsScreen extends StatelessWidget {
+class MealDetailsScreen extends ConsumerWidget {
   const MealDetailsScreen({
     super.key,
     required this.meal,
-    required this.onToggleFavorite,
   });
 
   final Meal meal;
-  final void Function(Meal meal) onToggleFavorite;
 
+  // When a Stateless Widget becomes a ConsumerWidget, the build method is replaced with a build method that takes a BuildContext and a WidgetRef as parameters.
+  // The WidgetRef ref parameter is used to access the providers that are used in the widget tree.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
         appBar: AppBar(title: Text(meal.title), actions: [
           IconButton(
             onPressed: () {
-              onToggleFavorite(meal);
+              // Here we are using the ref parameter to access the favoriteMealsProvider and call the toggleMealFavoriteStatus method.
+              final bool wasAdded = ref
+                  .read(favoriteMealsProvider.notifier)
+                  .toggleMealFavoriteStatus(meal);
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    wasAdded? '${meal.title} is now a favorite!' : '${meal.title} is no longer a favorite!'
+                  ),
+                ),
+              );
             },
             icon: const Icon(Icons.star),
           )
