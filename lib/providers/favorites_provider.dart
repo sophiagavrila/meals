@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meals/models/meal.dart';
 
+// This Provider processes dyanmically changing data and provides it to the widget tree.
 class FavoriteMealsNotifier extends StateNotifier<List<Meal>> {
   FavoriteMealsNotifier() : super([]);
 
