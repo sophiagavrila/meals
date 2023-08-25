@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+
 import 'package:meals/data/dummy_data.dart';
-import 'package:meals/screens/meals.dart';
-import 'package:meals/widgets/category_grid_item.dart';
-import 'package:meals/models/category.dart';
 import 'package:meals/models/meal.dart';
+import 'package:meals/widgets/category_grid_item.dart';
+import 'package:meals/screens/meals.dart';
+import 'package:meals/models/category.dart';
 
 class CategoriesScreen extends StatelessWidget {
-  const CategoriesScreen({super.key, required this.onToggleFavorite});
+  const CategoriesScreen({
+    super.key,
+    required this.onToggleFavorite,
+    required this.availableMeals,
+  });
 
   final void Function(Meal meal) onToggleFavorite;
+  final List<Meal> availableMeals;
 
-  // Navigating to Meals Screen
   void _selectCategory(BuildContext context, Category category) {
-    final filteredMeals = dummyMeals
+    final filteredMeals = availableMeals
         .where((meal) => meal.categories.contains(category.id))
         .toList();
 
@@ -24,7 +29,7 @@ class CategoriesScreen extends StatelessWidget {
           onToggleFavorite: onToggleFavorite,
         ),
       ),
-    );
+    ); // Navigator.push(context, route)
   }
 
   @override
@@ -38,14 +43,14 @@ class CategoriesScreen extends StatelessWidget {
         mainAxisSpacing: 20,
       ),
       children: [
-        ...availableCategories
-            .map((category) => CategoryGridItem(
-                category: category,
-                onSelectCategory: () {
-                  _selectCategory(context, category);
-                }))
-            .toList(),
-        // for (final category in availableCategories) CategoryGridItem(category: category),
+        // availableCategories.map((category) => CategoryGridItem(category: category)).toList()
+        for (final category in availableCategories)
+          CategoryGridItem(
+            category: category,
+            onSelectCategory: () {
+              _selectCategory(context, category);
+            },
+          )
       ],
     );
   }
